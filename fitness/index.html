@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Henquistador Lab — Fitness Tracker</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --border: #1e1e2e;
+    --text: #cdd6f4;
+    --dim: #6c7086;
+    --accent: #f5c2e7;
+    --accent2: #89b4fa;
+    --green: #a6e3a1;
+    --red: #f38ba8;
+    --yellow: #f9e2af;
+    --peach: #fab387;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+  h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+  }
+  h1 span { color: var(--accent); }
+  h2 {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 2rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 {
+    font-size: 0.85rem;
+    color: var(--peach);
+    margin: 1rem 0 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .subtitle { color: var(--dim); font-size: 0.8rem; margin-bottom: 2rem; }
+  .grid { display: grid; gap: 1rem; }
+  .grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .grid-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+  }
+  .card-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--dim);
+    margin-bottom: 0.5rem;
+  }
+  .card-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--green);
+  }
+  .card-value.blue { color: var(--accent2); }
+  .card-value.yellow { color: var(--yellow); }
+  .card-value.peach { color: var(--peach); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    color: var(--dim);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+  }
+  tr:hover { background: rgba(255,255,255,0.02); }
+  .tag {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  .tag-strength { background: rgba(245,194,231,0.15); color: var(--accent); }
+  .tag-cardio { background: rgba(137,180,250,0.15); color: var(--accent2); }
+  .tag-rest { background: rgba(166,227,161,0.15); color: var(--green); }
+  .tag-sport { background: rgba(250,179,135,0.15); color: var(--peach); }
+  .schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+  }
+  .day-cell {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .day-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--dim);
+    margin-bottom: 0.4rem;
+  }
+  .day-content {
+    font-size: 0.7rem;
+    line-height: 1.5;
+  }
+  .exercise-row { display: flex; justify-content: space-between; align-items: center; }
+  .exercise-name { font-weight: 500; }
+  .exercise-sets { color: var(--dim); font-size: 0.75rem; }
+  .input-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin: 0.25rem 0;
+  }
+  input[type="number"], input[type="text"], input[type="date"], select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.75rem;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent2); }
+  button {
+    background: var(--accent2);
+    color: var(--bg);
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:hover { opacity: 0.85; }
+  button.secondary {
+    background: var(--border);
+    color: var(--text);
+  }
+  .log-entry {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+  }
+  .log-date { color: var(--dim); }
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+  .note { color: var(--dim); font-size: 0.7rem; font-style: italic; margin-top: 0.25rem; }
+  .supplements-list { font-size: 0.78rem; }
+  .supplements-list li {
+    padding: 0.3rem 0;
+    list-style: none;
+    position: relative;
+    padding-left: 1.2rem;
+  }
+  .supplements-list li::before {
+    content: "💊";
+    position: absolute;
+    left: 0;
+    font-size: 0.7rem;
+  }
+  .tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .tab {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: var(--dim);
+    font-family: inherit;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+  .tab:hover { color: var(--text); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .hr-zone {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    background: rgba(163,166,194,0.1);
+    color: var(--accent2);
+    font-size: 0.7rem;
+    margin-left: 0.4rem;
+  }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); text-align: center; color: var(--dim); font-size: 0.6rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔬 <span>Henquistador</span> Lab — Fitness Tracker</h1>
+  <p class="subtitle">Olli • 42M • 180cm / 75kg • Target: Cut & Optimize</p>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="plan">Plan</button>
+    <button class="tab" data-tab="tracker">Tracker</button>
+    <button class="tab" data-tab="nutrition">Nutrition</button>
+    <button class="tab" data-tab="supplements">Supplements</button>
+    <button class="tab" data-tab="log">Log</button>
+  </div>
+
+  <!-- PLAN TAB -->
+  <div class="tab-content active" id="tab-plan">
+    <div class="grid grid-4" style="margin-bottom:2rem;">
+      <div class="card">
+        <div class="card-title">Weight</div>
+        <div class="card-value" id="disp-weight">75.0 <small style="font-size:0.8rem">kg</small></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Zone 2 HR</div>
+        <div class="card-value blue">115–125 <small style="font-size:0.8rem">bpm</small></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Protein Target</div>
+        <div class="card-value yellow">120–150g</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Cut Calories</div>
+        <div class="card-value peach">~2200 <small style="font-size:0.8rem">kcal</small></div>
+      </div>
+    </div>
+
+    <h2>Weekly Schedule</h2>
+    <div class="schedule-grid">
+      <div class="day-cell">
+        <div class="day-label">Mon</div>
+        <div class="day-content"><span class="tag tag-strength">Upper A</span></div>
+      </div>
+      <div class="day-cell">
+        <div class="day-label">Tue</div>
+        <div class="day-content"><span class="tag tag-cardio">Zone 2</span><br><small style="color:var(--dim)">45–60 min</small></div>
+      </div>
+      <div class="day-cell">
+        <div class="day-label">Wed</div>
+        <div class="day-content"><span class="tag tag-strength">Lower B</span></div>
+      </div>
+      <div class="day-cell">
+        <div class="day-label">Thu</div>
+        <div class="day-content"><span class="tag tag-strength">Upper C</span></div>
+      </div>
+      <div class="day-cell">
+        <div class="day-label">Fri</div>
+        <div class="day-content"><span class="tag tag-cardio">Zone 2 + HIIT</span></div>
+      </div>
+      <div class="day-cell">
+        <div class="day-label">Sat</div>
+        <div class="day-content"><span class="tag tag-strength">Lower D</span></div>
+      </div>
+      <div class="day-cell">
+        <div class="day-label">Sun</div>
+        <div class="day-content"><span class="tag tag-rest">Rest</span><br><small style="color:var(--dim)">Mobility</small></div>
+      </div>
+    </div>
+
+    <h2>Workout Details</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Day A — Upper</h3>
+        <table>
+          <tr><td class="exercise-name">Bench Press</td><td class="exercise-sets">4×5</td></tr>
+          <tr><td class="exercise-name">Weighted Pull-ups</td><td class="exercise-sets">4×5</td></tr>
+          <tr><td class="exercise-name">Overhead Press</td><td class="exercise-sets">3×8</td></tr>
+          <tr><td class="exercise-name">Barbell Rows</td><td class="exercise-sets">3×8</td></tr>
+          <tr><td class="exercise-name">Face Pulls</td><td class="exercise-sets">3×12</td></tr>
+          <tr><td class="exercise-name">Curls + Dips (SS)</td><td class="exercise-sets">3×10</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Day B — Lower</h3>
+        <table>
+          <tr><td class="exercise-name">Back Squat</td><td class="exercise-sets">4×5</td></tr>
+          <tr><td class="exercise-name">RDL</td><td class="exercise-sets">3×8</td></tr>
+          <tr><td class="exercise-name">Bulgarian Split Squat</td><td class="exercise-sets">3×10/leg</td></tr>
+          <tr><td class="exercise-name">Leg Curl</td><td class="exercise-sets">3×12</td></tr>
+          <tr><td class="exercise-name">Calf Raises</td><td class="exercise-sets">4×15</td></tr>
+          <tr><td class="exercise-name">Plank</td><td class="exercise-sets">3×60s</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Day C — Upper (Alt)</h3>
+        <table>
+          <tr><td class="exercise-name">Incline DB Press</td><td class="exercise-sets">4×8</td></tr>
+          <tr><td class="exercise-name">Chin-ups</td><td class="exercise-sets">4×6</td></tr>
+          <tr><td class="exercise-name">Lateral Raises</td><td class="exercise-sets">3×15</td></tr>
+          <tr><td class="exercise-name">Cable Rows</td><td class="exercise-sets">3×10</td></tr>
+          <tr><td class="exercise-name">Hammer Curl + Skullcrusher</td><td class="exercise-sets">3×12</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Day D — Lower (Alt)</h3>
+        <table>
+          <tr><td class="exercise-name">Front Squat</td><td class="exercise-sets">3×6</td></tr>
+          <tr><td class="exercise-name">Deadlift</td><td class="exercise-sets">3×5</td></tr>
+          <tr><td class="exercise-name">Step-ups</td><td class="exercise-sets">3×12/leg</td></tr>
+          <tr><td class="exercise-name">Hip Thrusts</td><td class="exercise-sets">3×10</td></tr>
+          <tr><td class="exercise-name">Hanging Leg Raises</td><td class="exercise-sets">3×15</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRACKER TAB -->
+  <div class="tab-content" id="tab-tracker">
+    <h2>Log Workout</h2>
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="input-group">
+        <input type="date" id="log-date">
+        <select id="log-workout">
+          <option value="upper-a">Upper A</option>
+          <option value="lower-b">Lower B</option>
+          <option value="upper-c">Upper C</option>
+          <option value="lower-d">Lower D</option>
+          <option value="zone2">Zone 2 Cardio</option>
+          <option value="hiit">HIIT</option>
+        </select>
+        <input type="text" id="log-notes" placeholder="Notes (PR, felt good, etc.)" style="flex:1;">
+      </div>
+      <div style="margin-top:0.75rem;">
+        <button onclick="logWorkout()">Log Session</button>
+      </div>
+    </div>
+
+    <h2>Body Weight</h2>
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="input-group">
+        <input type="date" id="weight-date">
+        <input type="number" id="weight-val" step="0.1" placeholder="kg" style="width:80px;">
+        <button onclick="logWeight()">Record</button>
+      </div>
+    </div>
+
+    <h2>Workout Log</h2>
+    <div class="card" id="workout-log">
+      <p class="note">No workouts logged yet.</p>
+    </div>
+
+    <h2>Weight History</h2>
+    <div class="card" id="weight-log">
+      <p class="note">No weight entries yet.</p>
+    </div>
+  </div>
+
+  <!-- NUTRITION TAB -->
+  <div class="tab-content" id="tab-nutrition">
+    <h2>Macro Targets</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Training Days</h3>
+        <table>
+          <tr><td>Protein</td><td>130–150g</td></tr>
+          <tr><td>Carbs</td><td>100–150g <span style="color:var(--dim);font-size:0.7rem;">(around workouts)</span></td></tr>
+          <tr><td>Fat</td><td>~80g</td></tr>
+          <tr><td>Calories</td><td>~2200–2400</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Rest Days</h3>
+        <table>
+          <tr><td>Protein</td><td>130–150g</td></tr>
+          <tr><td>Carbs</td><td>50–80g <span style="color:var(--dim);font-size:0.7rem;">(mostly veggies)</span></td></tr>
+          <tr><td>Fat</td><td>~85–95g</td></tr>
+          <tr><td>Calories</td><td>~1900–2100</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <h2>Food Guidelines</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>✅ Prioritize</h3>
+        <ul style="font-size:0.78rem;padding-left:1.2rem;">
+          <li>Fatty fish (salmon, mackerel, sardines)</li>
+          <li>Eggs & egg whites</li>
+          <li>Chicken breast, turkey</li>
+          <li>Olive oil, avocado, nuts</li>
+          <li>Berries, leafy greens</li>
+          <li>Sweet potato (around training)</li>
+          <li>Rice & oats (pre-workout only)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>❌ Minimize</h3>
+        <ul style="font-size:0.78rem;padding-left:1.2rem;">
+          <li>Refined sugar & sweets</li>
+          <li>White bread / processed carbs</li>
+          <li>Seed oils</li>
+          <li>Alcohol (especially beer)</li>
+          <li>Ultra-processed snacks</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Electrolytes (on low carb)</h2>
+    <div class="card">
+      <table>
+        <tr><td>Sodium</td><td>5–7g/day (salt everything)</td></tr>
+        <tr><td>Potassium</td><td>3–4g/day (avocado, spinach, supplements)</td></tr>
+        <tr><td>Magnesium</td><td>Already in longevity mix, aim for 300–400mg total</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- SUPPLEMENTS TAB -->
+  <div class="tab-content" id="tab-supplements">
+    <h2>Daily Stack</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Blueprint Bryan Johnson</h3>
+        <ul class="supplements-list">
+          <li><strong>Longevity Mix</strong> — creatine, ashwagandha, L-theanine, magnesium, glutathione, CaAKG, glycine, L-lysine + 10 others</li>
+          <li><strong>Essential Capsules</strong> — niacinamide, vitamin C, polyphenols, antioxidants</li>
+          <li><strong>Omega-3</strong> — 1000mg EPA/DHA</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Recommended Additions</h3>
+        <ul class="supplements-list">
+          <li><strong>Electrolyte mix</strong> — sodium, potassium, magnesium (critical on low carb)</li>
+          <li><strong>Vitamin D3</strong> — 2000–4000 IU (especially in Finnish winter)</li>
+          <li><strong>Creatine</strong> — 3–5g/day total (check longevity mix dose; supplement the gap)</li>
+          <li><strong>B-complex</strong> — B-vitamins can deplete on low carb</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Timing Notes</h2>
+    <div class="card">
+      <table>
+        <tr><td>Morning</td><td>Longevity Mix + Essential Capsules + Omega-3 + Vitamin D3</td></tr>
+        <tr><td>Pre-workout</td><td>Coffee/caffeine + electrolytes in water</td></tr>
+        <tr><td>Post-workout</td><td>Protein shake or meal (carbs within 1h)</td></tr>
+        <tr><td>Evening</td><td>Magnesium (if additional needed), ashwagandha calming</td></tr>
+      </table>
+      <p class="note"><strong>⚠️ Psilocybin microdosing:</strong> Not recommended. See discussion. Illegal in Finland. Human anti-inflammatory data doesn't exist yet.</p>
+    </div>
+  </div>
+
+  <!-- LOG TAB -->
+  <div class="tab-content" id="tab-log">
+    <h2>Daily Log</h2>
+    <div class="card">
+      <div class="input-group" style="margin-bottom:0.5rem;">
+        <input type="date" id="daily-log-date">
+        <input type="number" id="daily-mood" min="1" max="10" placeholder="Mood 1-10" style="width:100px;">
+      </div>
+      <div class="input-group" style="margin-bottom:0.5rem;">
+        <input type="number" id="daily-sleep" step="0.5" placeholder="Sleep hours" style="width:100px;">
+        <input type="number" id="daily-stress" min="1" max="10" placeholder="Stress 1-10" style="width:100px;">
+      </div>
+      <div class="input-group" style="margin-bottom:0.5rem;">
+        <textarea id="daily-notes" placeholder="How did you feel? Energy, soreness, digestion..." style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.5rem;font-family:inherit;font-size:0.75rem;border-radius:4px;min-height:80px;resize:vertical;"></textarea>
+      </div>
+      <button onclick="logDaily()">Save Entry</button>
+    </div>
+
+    <h2>History</h2>
+    <div class="card" id="daily-history">
+      <p class="note">No daily entries yet.</p>
+    </div>
+  </div>
+
+  <footer>
+    Generated by Henquistador 🔬 • Data stored locally in your browser
+  </footer>
+</div>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// Set default dates
+const today = new Date().toISOString().split('T')[0];
+document.querySelectorAll('input[type="date"]').forEach(el => el.value = today);
+
+// Storage helpers
+function getData(key) { return JSON.parse(localStorage.getItem(key) || '[]'); }
+function saveData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+
+// Log workout
+function logWorkout() {
+  const date = document.getElementById('log-date').value;
+  const workout = document.getElementById('log-workout').value;
+  const notes = document.getElementById('log-notes').value;
+  if (!date) return alert('Pick a date');
+  const logs = getData('workoutLogs');
+  logs.unshift({ date, workout, notes, ts: Date.now() });
+  saveData('workoutLogs', logs);
+  document.getElementById('log-notes').value = '';
+  renderWorkoutLogs();
+}
+
+function renderWorkoutLogs() {
+  const logs = getData('workoutLogs');
+  const el = document.getElementById('workout-log');
+  if (!logs.length) { el.innerHTML = '<p class="note">No workouts logged yet.</p>'; return; }
+  el.innerHTML = logs.slice(0, 20).map(l => `
+    <div class="log-entry">
+      <span><span class="tag tag-strength">${l.workout}</span> ${l.notes || ''}</span>
+      <span class="log-date">${l.date}</span>
+    </div>
+  `).join('');
+}
+
+// Log weight
+function logWeight() {
+  const date = document.getElementById('weight-date').value;
+  const val = parseFloat(document.getElementById('weight-val').value);
+  if (!val) return alert('Enter weight');
+  const logs = getData('weightLogs');
+  logs.unshift({ date, weight: val, ts: Date.now() });
+  saveData('weightLogs', logs);
+  document.getElementById('weight-val').value = '';
+  // Update display
+  document.getElementById('disp-weight').innerHTML = val.toFixed(1) + ' <small style="font-size:0.8rem">kg</small>';
+  renderWeightLogs();
+}
+
+function renderWeightLogs() {
+  const logs = getData('weightLogs');
+  const el = document.getElementById('weight-log');
+  if (!logs.length) { el.innerHTML = '<p class="note">No weight entries yet.</p>'; return; }
+  el.innerHTML = logs.slice(0, 20).map(l => `
+    <div class="log-entry">
+      <span>${l.weight} kg</span>
+      <span class="log-date">${l.date}</span>
+    </div>
+  `).join('');
+}
+
+// Daily log
+function logDaily() {
+  const date = document.getElementById('daily-log-date').value;
+  const mood = document.getElementById('daily-mood').value;
+  const sleep = document.getElementById('daily-sleep').value;
+  const stress = document.getElementById('daily-stress').value;
+  const notes = document.getElementById('daily-notes').value;
+  if (!date) return alert('Pick a date');
+  const logs = getData('dailyLogs');
+  logs.unshift({ date, mood, sleep, stress, notes, ts: Date.now() });
+  saveData('dailyLogs', logs);
+  ['daily-mood','daily-sleep','daily-stress','daily-notes'].forEach(id => document.getElementById(id).value = '');
+  renderDailyLogs();
+}
+
+function renderDailyLogs() {
+  const logs = getData('dailyLogs');
+  const el = document.getElementById('daily-history');
+  if (!logs.length) { el.innerHTML = '<p class="note">No daily entries yet.</p>'; return; }
+  el.innerHTML = logs.slice(0, 20).map(l => `
+    <div class="log-entry">
+      <span>${l.date} ${l.mood ? '😊'+l.mood : ''} ${l.sleep ? '💤'+l.sleep+'h' : ''} ${l.stress ? '⚡'+l.stress : ''} ${l.notes || ''}</span>
+    </div>
+  `).join('');
+}
+
+// Initial render
+renderWorkoutLogs();
+renderWeightLogs();
+renderDailyLogs();
+</script>
+</body>
+</html>
